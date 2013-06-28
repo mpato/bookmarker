@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -28,16 +29,32 @@ class MarkTree
     {
       Object node;
       node = jnode.get("id");
-      if (!(node instanceof Number))
+      try {
+        id = Integer.parseInt(node.toString());
+      } catch (Exception e) {
         return JSON_PARSE_INVALID_ID;
-      id = ((Number) node).intValue();
+      }
       node = jnode.get("date_added");
-      if (!(node instanceof Number))
+      try {
+        dateAdded = Long.parseLong(node.toString());
+      } catch (Exception e) {
         return JSON_PARSE_INVALID_DATE;
-      dateAdded = ((Number) node).longValue();
+      }
       link = jnode.get("url").toString();
       description = jnode.get("name").toString();
       return JSON_PARSE_OK;
+    }
+
+    public JSONObject toJSON()
+    {
+      JSONObject jurl;
+      jurl = new JSONObject();
+      jurl.put("type", "url");
+      jurl.put("id", id);
+      jurl.put("name", description);
+      jurl.put("url", link);
+      jurl.put("date_added", dateAdded);
+      return jurl;
     }
   }
 
@@ -97,19 +114,35 @@ class MarkTree
           ret = category.fromJSON(jchild);
           if (ret != JSON_PARSE_OK)
             return ret;
-          children.put(name.toLowerCase(), category);
+          newChildren.put(name.toLowerCase(), category);
         } else if (type.equals("url")) {
           mark = new Mark();
           ret = mark.fromJSON(jchild);
           if (ret != JSON_PARSE_OK)
             return ret;
-          marks.add(mark);
+          newMarks.add(mark);
         } else
           return JSON_PARSE_INVALID_TYPE;
       }
       children = newChildren;
       marks = newMarks;
       return JSON_PARSE_OK;
+    }
+
+    public JSONObject toJSON(String tag)
+    {
+      JSONObject jfolder;
+      JSONArray jchildren;
+      jfolder = new JSONObject();
+      jfolder.put("type", "folder");
+      jfolder.put("name", tag);
+      jchildren = new JSONArray();
+      for (Mark mark : marks)
+        jchildren.add(mark.toJSON());
+      for (Entry<String, MarkCategory> category : children.entrySet())
+        jchildren.add(category.getValue().toJSON(category.getKey()));
+      jfolder.put("children", jchildren);
+      return jfolder;
     }
   }
 
@@ -131,7 +164,7 @@ class MarkTree
       return JSON_PARSE_NO_ROOT;
     newRoots = new MarkCategory();
     jnode = (JSONObject) node;
-    for (Object child : jnode.entrySet()) {
+    for (Object child : jnode.values()) {
       if (!(child instanceof JSONObject))
         continue;
       ret = newRoots.fromJSON((JSONObject) child, false);
@@ -140,5 +173,15 @@ class MarkTree
     }
     roots = newRoots;
     return JSON_PARSE_OK;
+  }
+
+  public JSONObject toJSON()
+  {
+    JSONObject jtop, jroots;
+    jtop = new JSONObject();
+    jroots = new JSONObject();
+    jroots.put("__ROOTS__", roots.toJSON(""));
+    jtop.put("roots", jroots);
+    return jtop;
   }
 }

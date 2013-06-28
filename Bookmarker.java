@@ -72,6 +72,7 @@ public class Bookmarker
       MarkTree markTree;
       markTree = new MarkTree();
       System.out.println("Import: "+ markTree.fromJSON((JSONObject)JSONValue.parse(json)));
+      System.out.println("Import: "+ markTree.toJSON().toJSONString());
     } catch (FileNotFoundException ex) {
       System.out.println("Error opening import file " + fileName);
     } catch (Exception e) {
