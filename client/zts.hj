@@ -1,0 +1,3 @@
+#/bin/bash
+
+DISPLAY=:0 zenity --error --title="Fatal Error" --icon-name=error --text="Tell Andre to stop working and let's all go for a snack"

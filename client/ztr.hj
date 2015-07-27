@@ -1,0 +1,3 @@
+#/bin/bash
+
+zenity oi --error --title="Virus Fatal Error" --icon-name=error --text="Wait! Where am I? THIS NOT WINDOWS\!                    xx("
