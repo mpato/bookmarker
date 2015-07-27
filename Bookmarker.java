@@ -45,9 +45,9 @@ public class Bookmarker
 {
   public static void main(String[] args) throws Exception
   {
-    /*Thread t = new RequestListenerThread(8085);
+    Thread t = new RequestListenerThread(8085);
      t.setDaemon(false);
-     t.start();*/
+     t.start();
     if (args.length == 2 && args[0].equals("import"))
       importFrom(args[1]);
   }
@@ -110,7 +110,16 @@ public class Bookmarker
 
       System.out.println("Entity: " + new String(entityContent));
       response.setStatusCode(HttpStatus.SC_OK);
-      body = new StringEntity("this is the answer <?>");
+      //body = new StringEntity("true");
+      body = new StringEntity("<?xml version=”1.0” encoding=”UTF-8”?>" +
+			      "<wml>" +
+			      "<window>" +
+			      "<left>10</> <top>10</> <width>48</> <height>37</>" +
+			      "<caption>Título da janela</>" +
+			      "<autoclose>true</>" +
+			      "<onload>sendDeviceExternalMessage(PRINTER, 'ola'); sendDeviceExternalMessage(DISPLAY, 'no ecra'); sendDeviceExternalMessage(DRAWER, 'na gaveta'); sendDeviceExternalMessage(TPA, 'no tpa'); confirm('Deseja Fechar?');close();</>" +
+			      "</window>" +
+			      "</wml>");
       response.setEntity(body);
       System.out.println("Responding ...");
     }
